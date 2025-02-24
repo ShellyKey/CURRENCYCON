@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="converter-container">
+        <h1>Currency Converter</h1>
+        <form id="currency-form">
+            <div class="form-group">
+                <label for="amount">Amount:</label>
+                <input type="number" id="amount" placeholder="Enter amount" required>
+            </div>
+
+            <div class="form-group">
+                <label for="from-currency">From Currency:</label>
+                <select id="from-currency">
+                    <option value="INR">INR</option>
+                    <option value="JPY">JPY</option>
+                    <option value="KRW">KRW</option>
+                    <option value="AUD">AUD</option>
+                    <option value="NPR">NPR</option>
+                    <option value="AED">AED</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                    <option value="MXN">MXN</option>
+                    <option value="USD">USD</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="to-currency">To Currency:</label>
+                <select id="to-currency">
+                    <option value="INR">INR</option>
+                    <option value="JPY">JPY</option>
+                    <option value="KRW">KRW</option>
+                    <option value="AUD">AUD</option>
+                    <option value="NPR">NPR</option>
+                    <option value="AED">AED</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                    <option value="MXN">MXN</option>
+                    <option value="USD">USD</option>
+                </select>
+            </div>
+
+            <button type="submit" id="convert-btn">Convert</button>
+
+            <div class="result">
+                <h2>Converted Amount:</h2>
+                <p id="result-display">0</p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("currency-form").addEventListener("submit", function(event) {
+            event.preventDefault();  // Prevent form submission
+
+            let amount = document.getElementById("amount").value;
+            let fromCurrency = document.getElementById("from-currency").value;
+            let toCurrency = document.getElementById("to-currency").value;
+
+            if (!amount || amount <= 0) {
+                alert("Please enter a valid amount.");
+                return;
+            }
+
+            fetch("http://127.0.0.1:5000/convert", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    amount: parseFloat(amount),
+                    from_currency: fromCurrency,
+                    to_currency: toCurrency
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.converted_amount !== undefined) {
+                    document.getElementById("result-display").innerText = data.converted_amount;
+                } else {
+                    alert("Conversion failed: " + (data.error || "Unknown error"));
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Error connecting to the server.");
+            });
+        });
+    </script>
+</body>
+</html>
+
